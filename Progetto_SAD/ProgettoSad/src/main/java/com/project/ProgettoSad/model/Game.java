@@ -1,43 +1,80 @@
 package com.project.ProgettoSad.model;
 
-//formato date supportato da Java
 import java.time.LocalDateTime;
+import java.util.List;
 
-//annotation che permette l'implementazione del vincolo Not Blank
-import jakarta.validation.constraints.NotBlank;
-//annotation che indica che il valore è un identificativo
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-//annotation che identifica un oggetto che deve essere presente nel database
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import org.bson.types.ObjectId;
+
 @Document (collection = "GameDB")
-public class Game {
+public class Game{
 	
 	@Id
-	private long id; //identificativo univoco del documento
-	@NotBlank
-	private LocalDateTime dataInizio ; 
-	private LocalDateTime dataFine;
-	@NotBlank
-	private int scenario; //da aggiungere constraints sui valori che può assumere
+	@JsonSerialize(using= ToStringSerializer.class)
+	private ObjectId _id;
+	@CreatedDate
+	private LocalDateTime startDate; 
+	private LocalDateTime endDate;
+	private Host host;
+	private List<Guest> guest; 
+	Robot robot;
+	private int scenario;
+	private int totalRoundNumber;
+	private ClassUT classUt;
+	private String winner;
 	
-	public long getId() {
-		return id;
+	//CONSTRUCTORS
+	public Game() {
+		super();
 	}
-	public void setId(long id) {
-		this.id = id;
+	
+	public Game(ObjectId _id, LocalDateTime startDate, LocalDateTime endDate, Host host,
+			List<Guest> guest, Robot robot, int scenario, int totalRoundNumber, ClassUT classUt, String winner) {
+		super();
+		this._id = ObjectId.get();
+		this.startDate = startDate;
+		this.endDate = null;
+		this.host = host;
+		this.guest = guest;
+		this.robot = robot;
+		this.scenario = scenario;
+		this.totalRoundNumber = totalRoundNumber;
+		this.classUt = classUt;
+		this.winner = null;
 	}
-	public LocalDateTime getDataInizio() {
-		return dataInizio;
+	
+	//GETTERSETTER
+	public ObjectId getId() {
+		return _id;
 	}
-	public void setDataInizio(LocalDateTime dataInizio) {
-		this.dataInizio = dataInizio;
+	public void setId(ObjectId id) {
+		this._id = id;
 	}
-	public LocalDateTime getDataFine() {
-		return dataFine;
+	
+	public LocalDateTime getStartDate() {
+		return startDate;
 	}
-	public void setDataFine(LocalDateTime dataFine) {
-		this.dataFine = dataFine;
+	public void setStartDate(LocalDateTime startDate) {
+		this.startDate = startDate;
+	}
+	
+	public LocalDateTime getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(LocalDateTime endDate) {
+		this.endDate = endDate;
+	}
+	public Host getStudente() {
+		return host;
+	}
+	public void setStudente(Host host) {
+		this.host = host;
 	}
 	public int getScenario() {
 		return scenario;
@@ -45,5 +82,49 @@ public class Game {
 	public void setScenario(int scenario) {
 		this.scenario = scenario;
 	}
+	public ClassUT getClassUt() {
+		return classUt;
+	}
+	public void setClassUt(ClassUT classUt) {
+		this.classUt = classUt;
+	}
+	public Robot getRobot() {
+		return robot;
+	}
 
+	public void setRobot(Robot robot) {
+		this.robot = robot;
+	}
+		
+	public String getWinner() {
+		return winner;
+	}
+
+	public void setWinner(String winner) {
+		this.winner = winner;
+	}
+	public Host getHost() {
+		return host;
+	}
+
+	public void setHost(Host host) {
+		this.host = host;
+	}
+
+	public List<Guest> getGuest() {
+		return guest;
+	}
+
+	public void setGuest(List<Guest> guest) {
+		this.guest = guest;
+	}
+
+	public int getTotalRoundNumber() {
+		return totalRoundNumber;
+	}
+
+	public void setTotalRoundNumber(int totalRoundNumber) {
+		this.totalRoundNumber = totalRoundNumber;
+	}
+	
 }

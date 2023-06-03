@@ -1,87 +1,89 @@
 package com.project.ProgettoSad.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.project.ProgettoSad.model.Game;
-import com.project.ProgettoSad.exception.ExceptionGameNotFound;
+import com.project.ProgettoSad.model.*;
+import com.project.ProgettoSad.exception.ExceptionResourceNotFound;
 import com.project.ProgettoSad.repository.GameRepository;
+import com.project.ProgettoSad.repository.RoundRepository;
 
-//implementazione dei servizi indicati nell'interfaccia, indicato dall'annotazione Service
-//l'aggettivo transactional indicato per la classe fa in modo che 
-//la transizione faccia roll back in caso di RuntimeException e Error 
+
 @Service
 @Transactional
 public class GameServiceImpl implements GameService {
-	
-	//Injection point 
+	 
 	@Autowired
 	private GameRepository gameRepository;
+	@Autowired
+	private RoundRepository roundRepository;
+	@Autowired
+	private MongoTemplate mongoTemplate;
 	
-	//l'overriding permette l'implementazione di tutti i metodi indicati nell'interfaccia
-	//createGame salva l'elemento di tipo Game in ingresso nel database
 	@Override
-	public Game createGame(Game game) {
-		return gameRepository.save(game);
+	public String createGame(Game game) {
+		Game GameDB = gameRepository.save(game);
+		if (game.getScenario() == 1) {
+		this.roundRepository.save(new Round(GameDB.getId(),1));
+		return GameDB.getId().toString();
+		}
+		else {
+			for(int i = 1; i <= game.getTotalRoundNumber(); i++) {
+				this.roundRepository.save(new Round(GameDB.getId(),i));
+				}
+		}		
+		return GameDB.getId().toString();		
 	}
 	
-	//updateGame controlla che l'elemento di tipo Game in ingresso sia presente nel database:
-	//se è presente procede a farne l'update settandone tutti i campi e poi salvando
-	//se non è presente lancia un'eccezione
 	@Override
-	public Game updateGame(Game game) {
-		Optional <Game> GameDB = this.gameRepository.findById(game.getId());
-	
+	public Game endGame(ObjectId GID,String winner) {
+		Optional <Game> GameDB = this.gameRepository.findById(GID);
 		if(GameDB.isPresent()) {
 			Game gameUpdate = GameDB.get();
-			gameUpdate.setId(game.getId());
-			gameUpdate.setDataInizio(game.getDataInizio());
-			gameUpdate.setDataFine(game.getDataFine());
-			gameUpdate.setScenario(game.getScenario());
-			gameRepository.save(gameUpdate);
+			gameUpdate.setId(GID);
+			gameUpdate.setWinner(winner);
+			gameUpdate.setEndDate(LocalDateTime.now());
+			this.gameRepository.save(gameUpdate);
 			return gameUpdate;
 		}
 		else {
-			throw new ExceptionGameNotFound("Record not found with id : " + game.getId());
+			throw new ExceptionResourceNotFound("Record not found with id : " + GID);
 		}
 	}
-	
-	//getAllGames crea un oggetto List contenente tutti i Game presenti nel database
+
 	@Override
 	public List<Game> getAllGames(){
 		return this.gameRepository.findAll();
 	}
 	
-	//getGameById ritorna l'oggetto Game con l'Id corrispondente a quello in ingresso
-	//se questo è presente nel database, altrimenti lancia un'eccezione
 	@Override
-	public Game getGameById (long GID) {
+	public List<Game> readPlayerHistory(String PID) {
+		Criteria criteria = new Criteria();
+		criteria.orOperator(Criteria.where("host.studentId").is(PID),Criteria.where("guest.studentId").is(PID));
+		Query query = new Query(criteria);
+		List<Game> playerHistory = mongoTemplate.find(query,Game.class);
+		return playerHistory;
+	}
+
+	
+	@Override
+	public Game getGameById (ObjectId GID) {
 		Optional <Game> GameDB = this.gameRepository.findById(GID);
 		
 		if(GameDB.isPresent()) {
 			return GameDB.get();
 		}
 		else {
-			throw new ExceptionGameNotFound("No Record exists with Id:" + GID);
+			throw new ExceptionResourceNotFound("No Record exists with Id:" + GID);
 		}
 	}
-	
-	//deleteGame elimina dal database l'oggetto Game con l'Id corrispondente a quello in ingresso
-	//se questo è presente nel database, altrimenti lancia un'eccezione
-	@Override
-	public void deleteGame(long id) {
-		Optional <Game> GameDB = this.gameRepository.findById(id);
-		
-		if(GameDB.isPresent()) {
-			this.gameRepository.delete(GameDB.get());
-		}
-		else {
-			throw new ExceptionGameNotFound("No Record exists with Id:" + id);
-		}
-	}
-
 }
