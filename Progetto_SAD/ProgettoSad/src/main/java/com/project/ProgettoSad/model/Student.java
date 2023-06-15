@@ -1,7 +1,13 @@
 package com.project.ProgettoSad.model;
 
-
+import jakarta.validation.constraints.NotNull;
+/**
+*
+* Classe relativa allo studente.
+* @param	studentId	Identificativo dello studente
+*/
 public class Student {
+	@NotNull
 	private String studentId;
 
 	//CONSTRUCTORS
@@ -26,7 +32,7 @@ public class Student {
 	//TOSTRING
 	@Override
 	public String toString() {
-		return "Student [studentId=" + studentId + "]";
+		return studentId;
 	}
-	
+
 }

@@ -2,7 +2,12 @@ package com.project.ProgettoSad.exception;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-//permette di indicare un messaggio nella risposta http a seguito del verificarsi di un'eccezione
+/**
+*
+* Eccezione lanciata nel caso in cui l'utente cerca di accedere ad una risorsa che non esiste nella repository
+*
+*/
+
 @ResponseStatus
 public class ExceptionResourceNotFound extends RuntimeException {
 	private static final long serialVersionUID = 1L;

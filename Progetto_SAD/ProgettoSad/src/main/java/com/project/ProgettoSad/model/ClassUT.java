@@ -1,7 +1,18 @@
 package com.project.ProgettoSad.model;
 
+import com.project.ProgettoSad.exception.ExceptionResourceNotFound;
+
+import jakarta.validation.constraints.NotNull;
+/**
+*
+* Classe che contiene le informazioni relative alla classe under test.
+* @param	classId	L'identificativo della classe scelta per il testing.
+* @param	classBody	La directory in cui </td><td> &#232; </td></tr> contenuto il file della classe.
+*/
 public class ClassUT {
+	@NotNull
 	private String classId;
+	@NotNull
 	private String classBody;
 
 	//CONSTRUCTORS

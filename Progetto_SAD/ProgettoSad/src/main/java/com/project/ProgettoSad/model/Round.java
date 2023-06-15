@@ -1,5 +1,7 @@
 package com.project.ProgettoSad.model;
 
+import java.util.HashMap;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,6 +9,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+/**
+*
+* Classe che contiene le infromazioni relative al round.
+* @param	roundId	L'ObjectId del round.
+* @param	 gameId	L'ObjectId della partita a cui il round appartiene
+* @param	roundNumber	Il numero dell'attuale round da giocare.
+* @param	turn	HashMap contenente l'associazione tra i giocatori del round e le classi di test che questi hanno scritto.
+* @param	results	La stringa che indica i risultati del round.
+*/
 @Document (collection = "RoundDB")
 public class Round {
 	@Id
@@ -15,32 +26,39 @@ public class Round {
 	@JsonSerialize(using= ToStringSerializer.class)
 	private ObjectId gameId;
 	private int roundNumber;
-	private TestCase testCase;
+	private HashMap<String,String> turn;
+	private String robotTest;
+	private String results;
 	
 	//CONSTRUCTORS
 	public Round() {
 		super();
 		this.roundId = new ObjectId();
+		this.turn = new HashMap<String,String>();
 	}
 	
 	public Round(int roundNumber) {
 		super();
 		this.roundId = new ObjectId();
 		this.roundNumber = roundNumber;
+		this.turn = new HashMap<String,String>();
 	}
 	
 	public Round(ObjectId gameId, int roundNumber) {
 		super();
 		this.gameId = gameId;
 		this.roundNumber = roundNumber;
+		this.turn = new HashMap<String,String>();
 	}
 
-	public Round(ObjectId roundId, ObjectId gameId, int roundNumber, TestCase testCase) {
+	public Round(ObjectId roundId, ObjectId gameId, int roundNumber, HashMap<String,String> turn, String robotTest, String result) {
 		super();
 		this.roundId = roundId;
 		this.gameId = gameId;
 		this.roundNumber = roundNumber;
-		this.testCase = testCase;
+		this.turn = turn;
+		this.robotTest = robotTest;
+		this.results = result;
 	}
 	//GETTERSETTER
 	public ObjectId getRoundId() {
@@ -67,25 +85,28 @@ public class Round {
 		this.roundNumber = roundNumber;
 	}
 
-	public TestCase getTestCase() {
-		return testCase;
+	public HashMap<String, String> getTurn() {
+		return turn;
 	}
 
-	public void setTestCase(TestCase testCase) {
-		this.testCase = testCase;
+	public void setTurn(HashMap<String, String> turn) {
+		this.turn = turn;
 	}
 
-	public void setTestResult(Result result) {
-		this.testCase.result = result;
-	}
-	//TOSTRING
-	@Override
-	public String toString() {
-		return "Round [roundId=" + roundId + ", gameId=" + gameId + ", roundNumber=" + roundNumber + ", testCase="
-				+ testCase + "]";
+	public String getRobotTest() {
+		return robotTest;
 	}
 
-	
-	
+	public void setRobotTest(String robotTest) {
+		this.robotTest = robotTest;
+	}
+
+	public String getResults() {
+		return results;
+	}
+
+	public void setResults(String results) {
+		this.results = results;
+	}
 	
 }
